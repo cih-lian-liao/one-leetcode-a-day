@@ -1,5 +1,5 @@
 
-# Problem 1929: Concatenation of Array
+# Problem 1929. Concatenation of Array
 
 ### Problem Summary
 Given an integer array `nums` of length `n`, we need to create an array `ans` of length `2 * n`, where:
