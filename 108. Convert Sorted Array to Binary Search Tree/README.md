@@ -1,7 +1,6 @@
 
 # Problem 108. Convert Sorted Array to Binary Search Tree
 
-
 ### Problem Summary:
 Given a sorted array, convert it into a **height-balanced** Binary Search Tree (BST). A height-balanced BST is a tree where the depth of the left and right subtrees of every node never differs by more than one.
 
