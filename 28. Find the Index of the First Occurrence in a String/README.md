@@ -5,8 +5,8 @@
 Given two strings `haystack` and `needle`, we need to return the index of the first occurrence of `needle` in `haystack`. If `needle` does not exist in `haystack`, we return `-1`.
 
 For example:
-- `haystack = "hello"`, `needle = "ll"` -> Output: `2` (since "ll" starts at index 2 in "hello").
-- `haystack = "hello"`, `needle = "world"` -> Output: `-1` (since "world" is not in "hello").
+- `haystack = "hello"`, `needle = "ll"` -> Output: `2` (since `"ll"` starts at index 2 in `"hello"`).
+- `haystack = "hello"`, `needle = "world"` -> Output: `-1` (since `"world"` is not in `"hello"`).
 
 ---
 
@@ -126,3 +126,41 @@ For example:
 2. **Optimize**: If time allows, mention the Python `find()` method for efficiency.
 3. **Discuss Advanced Options**: If asked about large input cases or efficiency, explain the KMP algorithm as an optimal solution for complex patterns.
 4. **Code Clarity**: Practice explaining each step in the code and testing with examples like `haystack = "hello", needle = "ll"` to make sure the logic is clear.
+
+
+### Here’s how to approach KMP in a coding interview:
+
+1. Start with a Basic Solution: Begin by writing the brute-force solution to demonstrate your understanding of the problem.  
+2. Mention KMP and Explain Its Optimization Points: If time permits and the interviewer shows interest, introduce the KMP algorithm and its prefix table concept, highlighting how it optimizes the matching process. You don’t necessarily need to code it fully.  
+3. Avoid Getting Stuck in Complex Code: KMP can be complex to implement, and there might not be enough time in the interview to finish it. Often, explaining the principle and optimization points is sufficient to show your knowledge.
+
+
+> "To solve the problem more efficiently, I'd like to introduce the Knuth-Morris-Pratt (KMP) algorithm. The KMP algorithm is specifically designed to avoid unnecessary comparisons by utilizing a **prefix table**. This table helps us skip parts of the pattern (`needle`) that we know have already been matched, reducing the time complexity from O(n * m) to O(n + m), where `n` is the length of `haystack` and `m` is the length of `needle`."
+
+### Explain the Prefix Table
+
+> "The prefix table, also known as the partial match table, records the lengths of the longest prefix that is also a suffix for each position in the pattern. This way, if we encounter a mismatch while matching `needle` in `haystack`, we can use this table to jump to the appropriate position in `needle` without rechecking characters we've already compared."
+
+### How to Build the Prefix Table
+
+> "To build the prefix table:
+> - We initialize an array `prefix_table` to hold the longest prefix-suffix lengths for each position in `needle`.
+> - We use two pointers, `i` and `j`. The `i` pointer scans through `needle`, and `j` keeps track of the length of the longest matching prefix that ends at `i - 1`.
+> - If `needle[i] == needle[j]`, it means we can extend our prefix match, so we increment `j` and set `prefix_table[i]` to `j`.
+> - If they don't match, we set `j` to `prefix_table[j - 1]` to try a shorter prefix that we know is a potential match."
+
+### Example of Prefix Table Construction
+
+> "For example, if our pattern `needle` is `'ABABC'`, the prefix table would be `[0, 0, 1, 2, 0]`. Here, `1` at index `2` means the substring `'ABA'` has a matching prefix-suffix length of `1`, and `2` at index `3` means `'ABAB'` has a matching prefix-suffix length of `2`. This prefix table is what allows us to skip characters when there’s a mismatch."
+
+### Using the Prefix Table for Efficient Matching
+
+> "Once we have the prefix table, we can use it during the matching process:
+> - We compare characters in `haystack` and `needle` using two pointers, `i` and `j`.
+> - If there’s a match (`haystack[i] == needle[j]`), we increment both pointers.
+> - If there’s a mismatch, we use the prefix table to shift `j` back to `prefix_table[j - 1]` and continue comparing without resetting `i`.
+> - If `j` reaches the length of `needle`, it means we found the pattern, so we return `i - j + 1` as the starting index."
+
+### Summary of KMP’s Efficiency
+
+> "By leveraging the prefix table, KMP avoids redundant comparisons and brings the time complexity down to O(n + m), making it ideal for large-scale text matching. This optimization is especially useful when the pattern has repetitive characters or when working with long strings."
