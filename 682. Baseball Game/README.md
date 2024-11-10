@@ -1,7 +1,7 @@
 
 # Problem 682: Baseball Game
 
-#### UMPIRE Method
+#### [UMPIRE Method]
 
 
 ### Understanding
