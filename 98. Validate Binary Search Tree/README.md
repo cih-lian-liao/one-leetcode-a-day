@@ -9,7 +9,7 @@ Determine if a binary tree is a valid binary search tree (BST). A BST is defined
 3. Both the left and right subtrees must also be binary search trees.
 
 
-#### [UMPIRE Method Solution]
+##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
 
 #### 1. **Understand**
 
