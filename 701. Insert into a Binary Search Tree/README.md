@@ -20,7 +20,7 @@ It is **guaranteed** that the new value does not exist in the original BST.
   
 ---
 
-#### UMPIRE Method Solution
+##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
 
 ### 1. Understand
 
