@@ -1,6 +1,6 @@
 # Problem 238. Product of Array Except Self
 
-#### [UMPIRE Method]
+##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
 
 ### U - Understand the Problem
 The goal of this problem is to return an array `output` where each element `output[i]` represents the product of all elements in the input array `nums` except the element `nums[i]`. Important constraints are as follows:
