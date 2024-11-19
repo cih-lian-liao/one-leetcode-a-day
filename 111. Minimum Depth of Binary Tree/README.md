@@ -163,10 +163,11 @@ print(minDepth(root))  # Expected Output: 2
 
 #### **DFS Solution**
 
-**Approach**:
+**Approach**:  
 The depth-first search (DFS) approach calculates the minimum depth by recursively traversing the tree. The key is to ensure proper handling of cases where a node has only one child.
 
 **Steps**:
+
 1. Handle the base case where the root is `null` (return depth 0).
 2. Recursively calculate the minimum depth of the left and right subtrees.
 3. If one of the subtrees is missing (`null`), return the depth of the non-null subtree plus 1.
@@ -174,33 +175,27 @@ The depth-first search (DFS) approach calculates the minimum depth by recursivel
 
 **Implementation**:
 ```python
-class TreeNode:
-    def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def minDepth(self, root: Optional[TreeNode]) -> int:
+        if not root:
+            return 0
 
-def minDepthDFS(root):
-    """
-    Function to calculate the minimum depth of a binary tree using DFS.
-    """
-    # Base case: if the tree is empty
-    if not root:
-        return 0
-
-    # If one of the subtrees is missing
-    if not root.left:
-        return 1 + minDepthDFS(root.right)
-    if not root.right:
-        return 1 + minDepthDFS(root.left)
-
-    # If both subtrees are present, take the minimum depth
-    return 1 + min(minDepthDFS(root.left), minDepthDFS(root.right))
+        if not root.left:
+            return 1 + self.minDepth(root.right)
+        if not root.right:
+            return 1 + self.minDepth(root.left)
+        
+        return 1 + min(self.minDepth(root.right), self.minDepth(root.left))
 ```
 
 **Dry Run**:
-
-#### Example Input:
+##### Example Input:
 ```python
 # Tree structure:
 #       3
@@ -214,31 +209,40 @@ root.right = TreeNode(20)
 root.right.left = TreeNode(15)
 root.right.right = TreeNode(7)
 
-print(minDepthDFS(root))  # Expected Output: 2
+sol = Solution()
+print(sol.minDepth(root))  # Expected Output: 2
 ```
 
 #### Dry Run Steps:
-1. Call `minDepthDFS(3)`.
-   - Call `minDepthDFS(9)` → `9` is a leaf, return 1.
-   - Call `minDepthDFS(20)`:
-     - Call `minDepthDFS(15)` → `15` is a leaf, return 1.
-     - Call `minDepthDFS(7)` → `7` is a leaf, return 1.
+
+1. Call `minDepth(3)`.
+   - Call `minDepth(9)` → `9` is a leaf, return 1.
+   - Call `minDepth(20)`:
+     - Call `minDepth(15)` → `15` is a leaf, return 1.
+     - Call `minDepth(7)` → `7` is a leaf, return 1.
      - Return `1 + min(1, 1) = 2`.
 2. Return `1 + min(1, 2) = 2`.
 
-**Time Complexity**:
-- Each node is visited once, so the complexity is **O(n)**.
+### **Complexity Analysis**
 
-**Space Complexity**:
-- The recursive stack depth depends on the height of the tree. In the worst case (a skewed tree), the space complexity is **O(h)**, where `h` is the height of the tree.
+**Time Complexity**:  
+Each node is visited once, so the complexity is **O(n)**.
 
-**When to Use DFS**:
-- Use DFS if you are required to traverse the entire tree, or if BFS is not feasible due to memory constraints (e.g., when the tree's width is very large).
+**Space Complexity**:  
+The recursive stack depth depends on the height of the tree:
+- In the best case (balanced tree), **O(log n)**.
+- In the worst case (skewed tree), **O(n)**.
+
+### **When to Use DFS**
+
+- Use DFS when you need to traverse the entire tree.
+- It is effective for problems where the tree is relatively small or balanced.
+- Avoid using DFS for very deep or skewed trees, as it may lead to high space consumption or stack overflow.
 
 ---
-
-**Why This Problem Is Important**:
-- **Industry Relevance**: Tree traversal problems are common in technical interviews. This problem tests understanding of BFS/DFS and handling edge cases in tree structures.
+**Why This Problem Is Important**:  
+  
+**Industry Relevance**: Tree traversal problems are common in technical interviews. This problem tests understanding of BFS/DFS and handling edge cases in tree structures.
 
 **Prerequisites for Practicing**:
 - Basic understanding of binary trees.
