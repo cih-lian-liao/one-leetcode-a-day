@@ -176,7 +176,7 @@ inorder = [9, 3, 15, 20, 7]
 
 ---
 
-## **Why This Problem is Important**
+### **Why This Problem is Important**
 
 - **Industry Relevance:** This problem demonstrates binary tree construction, a crucial concept in file systems, database indexing, and compiler design.
 - **Prerequisites:** Binary trees, recursion, and traversal algorithms.
