@@ -181,6 +181,6 @@ inorder = [9, 3, 15, 20, 7]
 - **Industry Relevance:** This problem demonstrates binary tree construction, a crucial concept in file systems, database indexing, and compiler design.
 - **Prerequisites:** Binary trees, recursion, and traversal algorithms.
 - **Follow-up Practice Problems:**
-  - 106. Construct Binary Tree from Inorder and Postorder Traversal
-  - 94. Binary Tree Inorder Traversal
-  - 144. Binary Tree Preorder Traversal
+- 106. Construct Binary Tree from Inorder and Postorder Traversal
+- 94. Binary Tree Inorder Traversal
+- 144. Binary Tree Preorder Traversal
