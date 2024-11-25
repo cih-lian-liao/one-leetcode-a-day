@@ -178,7 +178,7 @@ def hasPathSum(root: TreeNode, targetSum: int) -> bool:
     targetSum -= root.val
 
     # Recursive calls to left and right children
-    return hasPathSum(root.left, targetSum) or hasPathSum(root.right, targetSum)
+    return self.hasPathSum(root.left, targetSum) or self.hasPathSum(root.right, targetSum)
 ```
 
 #### Explanation:
