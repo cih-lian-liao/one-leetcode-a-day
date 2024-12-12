@@ -1,4 +1,4 @@
-# LeetCode Problem 263: Ugly Number
+# LeetCode Problem 263. Ugly Number
 
 ##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
 
