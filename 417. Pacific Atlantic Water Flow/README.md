@@ -79,27 +79,36 @@ heights = [
 ```python
 class Solution:
     def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        # Get the number of rows and columns in the matrix
         ROWS, COLS = len(heights), len(heights[0])
+        # Sets to store cells reachable by Pacific and Atlantic oceans
         pacific, atlantic = set(), set()
 
+        # Helper function for DFS traversal
         def dfs(row, col, visited, prev_height):
+            # Check if the cell is out of bounds, already visited, or lower than the previous height
             if ((row, col) in visited or 
                 not (0 <= row < ROWS and 0 <= col < COLS) or 
                 heights[row][col] < prev_height):
                 return
+            # Mark the cell as visited
             visited.add((row, col))
+            # Define possible directions to move: down, up, right, left
             directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+            # Perform DFS for all valid neighboring cells
             for dr, dc in directions:
                 dfs(row + dr, col + dc, visited, heights[row][col])
 
+        # Start DFS from all Pacific ocean boundary cells (top row and left column)
         for col in range(COLS):
-            dfs(0, col, pacific, heights[0][col])
-            dfs(ROWS - 1, col, atlantic, heights[ROWS - 1][col])
+            dfs(0, col, pacific, heights[0][col])  # Top row
+            dfs(ROWS - 1, col, atlantic, heights[ROWS - 1][col])  # Bottom row
 
         for row in range(ROWS):
-            dfs(row, 0, pacific, heights[row][0])
-            dfs(row, COLS - 1, atlantic, heights[row][COLS - 1])
+            dfs(row, 0, pacific, heights[row][0])  # Left column
+            dfs(row, COLS - 1, atlantic, heights[row][COLS - 1])  # Right column
 
+        # Find the intersection of cells reachable by both oceans
         return list(map(list, pacific & atlantic))
 ```
 
@@ -109,30 +118,37 @@ from collections import deque
 
 class Solution:
     def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        # Get the number of rows and columns in the matrix
         ROWS, COLS = len(heights), len(heights[0])
 
+        # Helper function for BFS traversal
         def bfs(starts):
-            visited = set()
-            queue = deque(starts)
+            visited = set()  # Set to keep track of visited cells
+            queue = deque(starts)  # Initialize a queue with starting points
             while queue:
-                r, c = queue.popleft()
+                r, c = queue.popleft()  # Dequeue the front element
                 if (r, c) in visited:
-                    continue
-                visited.add((r, c))
+                    continue  # Skip already visited cells
+                visited.add((r, c))  # Mark the current cell as visited
+                # Iterate through all possible directions: down, up, right, left
                 for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-                    nr, nc = r + dr, c + dc
+                    nr, nc = r + dr, c + dc  # Calculate the new row and column
+                    # Check if the neighboring cell is within bounds, not visited, and valid for water flow
                     if (0 <= nr < ROWS and 0 <= nc < COLS and
                         (nr, nc) not in visited and
                         heights[nr][nc] >= heights[r][c]):
-                        queue.append((nr, nc))
-            return visited
+                        queue.append((nr, nc))  # Add the cell to the queue
+            return visited  # Return all reachable cells
 
-        pacific_starts = [(0, c) for c in range(COLS)] + [(r, 0) for r in range(ROWS)]
-        atlantic_starts = [(ROWS - 1, c) for c in range(COLS)] + [(r, COLS - 1) for r in range(ROWS)]
+        # Initialize the starting points for Pacific and Atlantic oceans
+        pacific_starts = [(0, c) for c in range(COLS)] + [(r, 0) for r in range(ROWS)]  # Top row and left column
+        atlantic_starts = [(ROWS - 1, c) for c in range(COLS)] + [(r, COLS - 1) for r in range(ROWS)]  # Bottom row and right column
 
-        pacific_reachable = bfs(pacific_starts)
-        atlantic_reachable = bfs(atlantic_starts)
+        # Perform BFS for both oceans
+        pacific_reachable = bfs(pacific_starts)  # Cells reachable by the Pacific Ocean
+        atlantic_reachable = bfs(atlantic_starts)  # Cells reachable by the Atlantic Ocean
 
+        # Find the intersection of cells reachable by both oceans
         return list(map(list, pacific_reachable & atlantic_reachable))
 ```
 
