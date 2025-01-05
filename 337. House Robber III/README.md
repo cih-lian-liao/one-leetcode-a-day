@@ -2,13 +2,13 @@
 
 # LeetCode 337: House Robber III
 
-# Problem Statement
+### Problem Statement
 
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses along this street are arranged in a binary tree. It is impossible to rob two directly connected houses (parent and child). Your task is to calculate the maximum amount of money you can rob without alerting the police.
 
-### Example
+#### Example
 
-#### Example 1:
+##### Example 1:
 ```
 Input: root = [3,2,3,null,3,null,1]
 Output: 7
@@ -21,7 +21,7 @@ Explanation:
 Maximum amount robbed = 3 + 3 + 1 = 7.
 ```
 
-#### Example 2:
+##### Example 2:
 ```
 Input: root = [3,4,5,1,3,null,1]
 Output: 9
