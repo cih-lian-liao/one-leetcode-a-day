@@ -56,6 +56,9 @@ from typing import List
 
 class Solution:
     def jump(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return 0
+
         jumps = 0       # Counts the number of jumps made
         end = 0         # End of the current jump range
         farthest = 0    # The farthest index we can currently reach
@@ -188,6 +191,9 @@ from typing import List
 
 class Solution:
     def jump(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return 0
+
         jumps = 0       # 紀錄跳躍次數
         end = 0         # 當前跳躍的範圍結束點
         farthest = 0    # 可到達的最遠位置
