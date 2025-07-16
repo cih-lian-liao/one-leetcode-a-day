@@ -660,3 +660,305 @@ Level 1:                [7] ✅ total=7 → 加入答案
 | `total == target` | 成功找到一組解法，加到結果裡                          |
 | `start`           | 控制重複使用 or 不重複的關鍵（這題可以重複使用，所以是 i，不是 i+1） |
 
+#
+#
+#
+
+# 🎙️ English Spoken-Style Explanation for Code Interview
+
+### 1️⃣ **Clarify the problem**
+
+"Let me make sure I understand the problem correctly.
+
+We're given a list of unique positive integers called `candidates`, and a target number.
+We need to return all possible unique combinations of numbers from the list that sum up to the target.
+
+Each number in the list can be used an unlimited number of times.
+However, the solution must not contain duplicate combinations — meaning \[2,2,3] and \[3,2,2] should be considered the same and only appear once.
+
+Is that correct?"
+
+*(Wait for confirmation from interviewer)*
+
+---
+
+### 2️⃣ **Discuss edge cases**
+
+"Now let me quickly go over some potential edge cases we might want to consider:
+
+* What if the `candidates` array is empty? In that case, there's no way to form any combination, so we return an empty list.
+* What if the target is zero? Technically, an empty combination could be considered valid, but in this problem, we likely return an empty list too.
+* What if none of the numbers can sum up to the target? For example, if `candidates = [5, 6]` and `target = 2`, the result should be an empty list.
+* Since each number can be reused, we also want to make sure we don’t generate infinite loops in our recursion."
+
+---
+
+### 3️⃣ **Consider brute-force and optimal approach**
+
+"A brute-force solution would be to generate all possible combinations of numbers, allowing repetition, and check which ones sum up to the target.
+This would be extremely inefficient, especially if the target is large, because it generates a huge number of possibilities.
+
+A more optimal approach is to use **backtracking with pruning**.
+
+We use a depth-first search strategy, building combinations incrementally and backtracking when the current combination exceeds the target.
+
+To avoid duplicate combinations, we keep track of the current index we’re exploring and make sure we don’t revisit previous indices — this helps prevent permutations of the same numbers."
+
+---
+
+### 4️⃣ **Explain and implement optimal code**
+
+"Let me walk you through the backtracking approach as I implement it."
+
+#### 🐍 Python (spoken explanation)
+
+```python
+def combinationSum(candidates, target):
+    result = []
+
+    def backtrack(start, path, total):
+        # If we hit the target exactly, we record the combination
+        if total == target:
+            result.append(path[:])
+            return
+        # If we go over the target, we stop exploring this path
+        if total > target:
+            return
+
+        for i in range(start, len(candidates)):
+            # Choose the current candidate
+            path.append(candidates[i])
+            # Explore further with the same index since repetition is allowed
+            backtrack(i, path, total + candidates[i])
+            # Backtrack: remove the last number to try the next option
+            path.pop()
+
+    # Start backtracking from index 0, with an empty path and sum of 0
+    backtrack(0, [], 0)
+    return result
+```
+
+🗣️ **Spoken version:**
+
+> "We define a helper function called `backtrack` that takes the current index, the current path of numbers we're building, and the running total.
+> If the total equals the target, we add a copy of the path to our result.
+> If it exceeds the target, we stop exploring.
+
+Inside the loop, we explore every candidate starting from the `start` index — this avoids duplicates.
+We append the number, recursively call backtrack with the updated total, and finally `pop()` the last number to try the next candidate.
+This process ensures we explore all valid combinations."
+
+---
+
+#### 🌐 JavaScript (spoken explanation)
+
+```javascript
+function combinationSum(candidates, target) {
+    const result = [];
+
+    function backtrack(start, path, total) {
+        if (total === target) {
+            result.push([...path]);
+            return;
+        }
+        if (total > target) return;
+
+        for (let i = start; i < candidates.length; i++) {
+            path.push(candidates[i]);
+            backtrack(i, path, total + candidates[i]);
+            path.pop();
+        }
+    }
+
+    backtrack(0, [], 0);
+    return result;
+}
+```
+
+🗣️ **Spoken version:**
+
+> "This is the same logic but implemented in JavaScript.
+> We use an inner function called `backtrack` with three arguments: start index, the current path, and total sum.
+> The base cases are identical — if total equals target, we store a copy of the path. If it exceeds, we return early.
+> We use a for loop to go through the candidates starting at the current index, allowing reuse of numbers.
+> Each number is added to the path, we recurse, and then we remove it — that's the backtracking step."
+
+---
+
+### 5️⃣ **Discuss time/space complexity**
+
+"The time complexity is **exponential** in the worst case — specifically **O(2^T)** where T is the target value.
+That’s because we’re exploring all combinations that can sum up to the target.
+
+The space complexity is also **O(T)** because the recursion stack can go as deep as the target value — for example, if we keep adding 1 until we reach target.
+
+We also store all valid combinations in memory, so result size affects total space as well."
+
+---
+
+### 6️⃣ **Mention follow-up questions**
+
+"Some follow-up questions that might come up include:
+
+* What if each number can only be used **once** instead of unlimited times? That would be Combination Sum II.
+* What if the input array can contain duplicates? Then we need to be more careful with skipping duplicates to avoid redundant results.
+* Can we optimize further using memoization or dynamic programming? Possibly, though for small inputs, backtracking is acceptable.
+
+Would you like me to implement a version that avoids using recursion, maybe with iterative DFS or dynamic programming?"
+
+
+#
+#
+#
+# 🧩 LeetCode 39 - Combination Sum | 面試英文口語解題筆記（中英對照）
+
+
+### 🧠 Clarify the Problem
+
+#### English
+
+"Let me make sure I understand the problem correctly.
+We're given a list of **unique positive integers** called `candidates`, and a `target` integer.
+We need to return all **unique combinations** where the chosen numbers add up exactly to the target.
+Each number in `candidates` can be used **unlimited times** in each combination.
+Also, the solution set must **not contain duplicate combinations**, meaning `[2,2,3]` and `[3,2,2]` are considered the same and should only appear once.
+Is that correct?"
+
+#### 中文
+
+「我想先確認我理解題目的意思。
+我們會得到一個由**不重複的正整數**組成的 `candidates` 陣列，還有一個整數 `target`。
+目標是找出所有可以加總為 `target` 的**組合**。
+其中每個數字可以**無限次重複使用**，但**不能有重複的組合**（順序不同也視為重複，例如 `[2,2,3]` 和 `[3,2,2]` 算同一組）。
+這樣的理解正確嗎？」
+
+---
+
+### 🔍 Edge Cases
+
+#### English
+
+"Let me consider a few edge cases:
+
+* If the `candidates` array is empty, there’s no combination to return.
+* If the `target` is 0, we probably return an empty list because the only possible sum is from an empty path.
+* If no combination can sum up to the target, like `[5, 6]` with target `2`, we should return an empty result.
+* Since each number can be used multiple times, we need to ensure our recursion doesn’t fall into an infinite loop."
+
+#### 中文
+
+「我來想想幾個邊界情況：
+
+* 如果 `candidates` 是空的，那當然沒辦法湊出任何組合。
+* 如果 `target` 是 0，根據這題定義，可能要回傳空陣列。
+* 如果沒有任何組合能加總為目標，比如 `[5,6]` 的 target 是 2，也應該回傳空的。
+* 因為數字可以重複使用，所以要小心遞迴不要進入無限循環。」
+
+---
+
+### 💡 Brute Force vs Optimal Approach
+
+#### English
+
+"A brute-force solution would try every possible combination using recursion, checking if the sum equals the target — but that would be inefficient.
+Instead, we’ll use a **backtracking approach**.
+We’ll build up combinations incrementally and **backtrack** whenever the running sum exceeds the target.
+To avoid duplicate results like `[2,3,2]` vs `[3,2,2]`, we’ll maintain a `start` index so we don’t revisit prior values."
+
+#### 中文
+
+「暴力解法會遞迴列出所有可能組合，檢查加總是否等於 target，但效率太低。
+我們會用**回溯法（backtracking）**：一邊遞迴一邊累積組合，只要加總超過 target 就馬上回退。
+為了避免像 `[2,3,2]` 和 `[3,2,2]` 這樣的重複組合，我們會用 `start` index 限制每層遞迴只往後選，避免使用前面的數字。」
+
+---
+
+### 👨‍💻 Optimal Code with Explanation (Python & JavaScript)
+
+#### Python Code
+
+```python
+def combinationSum(candidates, target):
+    result = []
+
+    def backtrack(start, path, total):
+        # 🎯 Base case: found a valid combination
+        if total == target:
+            result.append(path[:])  # Make a copy before storing
+            return
+        # 🚫 Exceeds target → stop exploring
+        if total > target:
+            return
+
+        for i in range(start, len(candidates)):
+            # ✅ Choose the current candidate
+            path.append(candidates[i])
+            # 🔁 Recurse (can reuse same index)
+            backtrack(i, path, total + candidates[i])
+            # ⏪ Backtrack: undo the choice
+            path.pop()
+
+    backtrack(0, [], 0)
+    return result
+```
+
+#### JavaScript Code
+
+```javascript
+function combinationSum(candidates, target) {
+    const result = [];
+
+    function backtrack(start, path, total) {
+        // 🎯 Found a valid combination
+        if (total === target) {
+            result.push([...path]);  // Make a copy
+            return;
+        }
+        // 🚫 Stop if total exceeds target
+        if (total > target) return;
+
+        for (let i = start; i < candidates.length; i++) {
+            // ✅ Choose current number
+            path.push(candidates[i]);
+            // 🔁 Recurse with same index (reusing allowed)
+            backtrack(i, path, total + candidates[i]);
+            // ⏪ Backtrack
+            path.pop();
+        }
+    }
+
+    backtrack(0, [], 0);
+    return result;
+}
+```
+
+---
+
+### ⏱️ Time and Space Complexity
+
+#### English
+
+* **Time Complexity**: Exponential in the worst case → O(2^T), where T is the target value.
+* **Space Complexity**: O(T) for recursion stack, and additional space to store results.
+
+#### 中文
+
+* **時間複雜度**：最差是指數級 → O(2^T)，T 是 target 值。
+* **空間複雜度**：最多 O(T) 層遞迴，還有額外空間儲存結果組合。
+
+---
+
+### 💬 Follow-up Questions
+
+#### English
+
+* What if each number could only be used **once**? That becomes Combination Sum II.
+* What if the array contains duplicates? We’d need to sort the array and skip duplicates during iteration.
+* Can we optimize with memoization or DP? Possibly, though backtracking is often more intuitive and efficient for small inputs.
+
+#### 中文
+
+* 如果每個數字只能用一次呢？那就是 LeetCode 40 - Combination Sum II。
+* 如果 `candidates` 本身有重複數字？那就要先排序並在遞迴中跳過重複。
+* 可以用記憶化或動態規劃優化嗎？有可能，但對於這種小範圍組合問題，backtracking 通常更直覺且夠快。
+
