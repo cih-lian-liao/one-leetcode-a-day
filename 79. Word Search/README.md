@@ -617,3 +617,358 @@ O(L)，來自遞迴呼叫的堆疊深度。
 * 如果每個格子可以多次使用但需要冷卻時間呢？
 * 如果要找出所有可能的起點，而不是只問是否存在？
 * 若我們要查很多單詞，是否可以使用 Trie 來加速？
+
+#
+#
+#
+
+# 🧠 **Spoken English Interview Explanation — LeetCode 79: Word Search**
+
+
+### 1️⃣ **Clarify the problem**
+
+> “Let me make sure I understand the problem correctly.
+> We’re given a 2D board of characters and a word, and we need to determine if the word can be formed by sequentially adjacent letters on the board.
+> Adjacency here means horizontally or vertically neighboring cells — no diagonals.
+> Each letter cell may only be used **once per path**.
+
+The function should return true if the word exists in the board, and false otherwise.
+
+Does that match your understanding as well? Are there any constraints I should keep in mind, like maximum word length or board size?”
+
+---
+
+### 2️⃣ **Discuss edge cases**
+
+> “Here are a few edge cases I’d like to consider before jumping into the solution:
+
+* If either the board or the word is empty, we should return false.
+* If the word’s length is longer than the total number of cells in the board, it’s impossible to match, so we can return false early.
+* If there are multiple possible starting points in the grid (like multiple cells with the first character of the word), we need to try them all.
+* Also, it's important to make sure we’re not revisiting the same cell during one path — that’s something to handle carefully.”
+
+---
+
+### 3️⃣ **Consider brute-force and optimal approach**
+
+> “So, at a high level, a brute-force solution would be to try every possible path from every starting point on the board.
+> This would be very inefficient because the number of possible paths grows exponentially.
+
+Instead, we can take a more optimal approach using **DFS with backtracking**.
+Here’s the idea:
+
+* We’ll scan the board for every cell that matches the first character of the word.
+* From there, we’ll recursively explore all 4 directions — up, down, left, and right.
+* To avoid revisiting a cell, we’ll mark it as visited (for example, by temporarily replacing the character with a special symbol like `'#'`).
+* If the current path doesn’t lead to a full match, we’ll backtrack — meaning we restore the character and try other directions.”
+
+---
+
+### 4️⃣ **Explain and implement optimal code**
+
+#### 🐍 Python (spoken walkthrough)
+
+> “Let me walk you through the Python implementation step by step, and explain as I code.”
+
+```python
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        rows, cols = len(board), len(board[0])
+
+        # Define the recursive DFS helper
+        def dfs(r, c, index):
+            # Base case: if all characters matched
+            if index == len(word):
+                return True
+            # Out of bounds, mismatch, or already visited
+            if r < 0 or c < 0 or r >= rows or c >= cols or board[r][c] != word[index]:
+                return False
+
+            # Mark current cell as visited by replacing its value
+            temp = board[r][c]
+            board[r][c] = "#"
+
+            # Explore all 4 directions
+            found = (dfs(r+1, c, index+1) or
+                     dfs(r-1, c, index+1) or
+                     dfs(r, c+1, index+1) or
+                     dfs(r, c-1, index+1))
+
+            # Backtrack — restore the character
+            board[r][c] = temp
+            return found
+
+        # Try starting DFS from every cell that matches word[0]
+        for i in range(rows):
+            for j in range(cols):
+                if board[i][j] == word[0]:
+                    if dfs(i, j, 0):
+                        return True
+        return False
+```
+
+> “So we check every cell. If we find the first character, we start the DFS from there.
+> If any of those DFS paths return true, we return true immediately.
+> If we try all cells and none of them work, we return false.”
+
+#### 🌐 JavaScript (spoken walkthrough)
+
+> “Now let me do a quick JavaScript version — it’s the same logic.”
+
+```javascript
+var exist = function(board, word) {
+    const rows = board.length;
+    const cols = board[0].length;
+
+    const dfs = (r, c, index) => {
+        if (index === word.length) return true;
+        if (r < 0 || c < 0 || r >= rows || c >= cols || board[r][c] !== word[index]) {
+            return false;
+        }
+
+        const temp = board[r][c];
+        board[r][c] = '#'; // Mark visited
+
+        const found = dfs(r + 1, c, index + 1) ||
+                      dfs(r - 1, c, index + 1) ||
+                      dfs(r, c + 1, index + 1) ||
+                      dfs(r, c - 1, index + 1);
+
+        board[r][c] = temp; // Backtrack
+        return found;
+    };
+
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            if (board[i][j] === word[0] && dfs(i, j, 0)) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+```
+
+---
+
+### 5️⃣ **Discuss time and space complexity**
+
+> “Now let’s talk about the time and space complexity:
+
+* **Time complexity** is O(M × N × 4^L) in the worst case, where:
+
+  * M × N is the total number of cells,
+  * L is the length of the word,
+  * 4^L represents the branching factor for 4 directions at each character.
+
+* **Space complexity** is O(L), where L is the depth of the recursion stack — one level for each character in the word.”
+
+---
+
+### 6️⃣ **Mention follow-up questions**
+
+> “Here are some follow-up questions we might discuss:
+
+* What if diagonal movement was allowed? That would increase our branching factor.
+* What if we had to find and return **all** occurrences or paths of the word instead of just checking existence?
+* Could we extend this solution to support searching for **multiple words**? In that case, we might consider using a Trie to optimize the lookups. (LeetCode No 212. Word Search II)
+* If the board was extremely large, could we add caching or pruning logic to improve performance?”
+
+#
+#
+#
+
+### 🧐 1. Clarify the Problem | 理解題目
+
+#### 🗣️ English
+
+Let me make sure I understand the problem correctly.
+We’re given a 2D board of characters and a string `word`.
+We need to check if the word can be constructed by adjacent characters in the board, where adjacency means horizontally or vertically.
+We cannot use the same cell more than once in a path.
+The function should return `true` if the word exists, and `false` otherwise.
+
+Are there any constraints on the board size or word length I should be aware of?
+
+#### 📘 中文
+
+讓我先確認我對題目的理解是否正確。
+給定一個由字母組成的二維網格和一個單字，我們要確認這個單字是否可以透過「相鄰的格子」組成。
+這裡的相鄰只包含上下左右（不包含斜角），而每個格子只能用一次。
+如果這個單字存在於網格中，回傳 `true`，否則回傳 `false`。
+
+請問有沒有什麼需要注意的限制條件，例如網格大小或字串長度？
+
+---
+
+### 🧱 2. Discuss Edge Cases | 討論邊界條件
+
+#### 🗣️ English
+
+Here are some edge cases I’d like to consider:
+
+* If the board or the word is empty, we should return false.
+* If the word is longer than the total number of cells in the board, then it’s impossible to find.
+* If multiple cells contain the first letter, we need to try starting from each one.
+* We must make sure not to revisit the same cell during a single path.
+
+#### 📘 中文
+
+以下是我想要先考慮的一些邊界情況：
+
+* 如果 `board` 或 `word` 是空的，應該直接回傳 false。
+* 如果單字長度比整個網格的格子總數還多，那根本不可能成立。
+* 如果有很多格子都等於單字的第一個字母，我們必須從每個位置都試看看。
+* 一條搜尋路徑中，不能重複使用同一格。
+
+---
+
+### 🧠 3. Brute-force and Optimal Approach | 暴力法與最佳解法
+
+#### 🗣️ English
+
+The brute-force approach would be trying to build the word from every cell and exploring all paths — this would be very inefficient.
+
+Instead, we can use **DFS with backtracking**.
+Here’s the plan:
+
+* Start DFS from any cell that matches the first character.
+* Explore in 4 directions (up, down, left, right).
+* Temporarily mark a cell as visited using a special symbol like `#`.
+* If we reach a dead end, backtrack by restoring the original letter.
+
+#### 📘 中文
+
+暴力法的話，就是從每一個格子出發，嘗試走出所有可能的路徑來組成單字，這樣的效率非常差。
+
+我們可以改用 **DFS（深度優先搜尋）搭配回溯法（Backtracking）**。
+具體做法是：
+
+* 從所有等於單字第一個字母的格子開始 DFS。
+* 每次探索四個方向（上、下、左、右）。
+* 為了避免重複走相同格子，可以暫時將該格設為 `#` 作為標記。
+* 若這條路走不通，就回溯並還原格子原本的內容。
+
+---
+
+### 💻 4. Implement the Optimal Code | 程式實作與說明
+
+#### 🐍 Python Version
+
+```python
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        rows, cols = len(board), len(board[0])
+
+        def dfs(r, c, index):
+            # All characters matched
+            if index == len(word):
+                return True
+            # Out of bounds or mismatch or visited
+            if r < 0 or c < 0 or r >= rows or c >= cols or board[r][c] != word[index]:
+                return False
+
+            temp = board[r][c]
+            board[r][c] = "#"
+
+            found = (dfs(r+1, c, index+1) or
+                     dfs(r-1, c, index+1) or
+                     dfs(r, c+1, index+1) or
+                     dfs(r, c-1, index+1))
+
+            board[r][c] = temp
+            return found
+
+        for i in range(rows):
+            for j in range(cols):
+                if board[i][j] == word[0]:
+                    if dfs(i, j, 0):
+                        return True
+        return False
+```
+
+> 🗣️ “We try DFS from every possible starting cell. If the path works, we return true. If none of them match the word, we return false.”
+
+---
+
+#### 🌐 JavaScript Version
+
+```javascript
+var exist = function(board, word) {
+    const rows = board.length;
+    const cols = board[0].length;
+
+    const dfs = (r, c, index) => {
+        if (index === word.length) return true;
+        if (r < 0 || c < 0 || r >= rows || c >= cols || board[r][c] !== word[index]) {
+            return false;
+        }
+
+        const temp = board[r][c];
+        board[r][c] = "#";
+
+        const found = dfs(r + 1, c, index + 1) ||
+                      dfs(r - 1, c, index + 1) ||
+                      dfs(r, c + 1, index + 1) ||
+                      dfs(r, c - 1, index + 1);
+
+        board[r][c] = temp;
+        return found;
+    };
+
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            if (board[i][j] === word[0] && dfs(i, j, 0)) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+```
+
+> 🗣️ “Same logic in JavaScript — start from any matching cell, explore recursively, and backtrack when needed.”
+
+---
+
+### ⏱️ 5. Time and Space Complexity | 時間與空間複雜度
+
+#### 🗣️ English
+
+**Time complexity:** O(M × N × 4^L)
+
+* M × N is the number of cells in the board.
+* L is the length of the word.
+* 4^L comes from the fact that from each cell, we can explore up to 4 directions.
+
+**Space complexity:** O(L) — due to the recursion stack.
+
+#### 📘 中文
+
+**時間複雜度：** O(M × N × 4^L)
+
+* M × N 是網格的總格子數。
+* L 是單字的長度。
+* 因為每個字母可以往四個方向探索，所以總路徑可能是 4 的 L 次方。
+
+**空間複雜度：** O(L)，來自遞迴的最大堆疊深度。
+
+---
+
+### 💡 6. Follow-up Questions | 延伸問題討論
+
+#### 🗣️ English
+
+* What if diagonal movement is allowed?
+* What if we need to find and return all possible paths or starting coordinates?
+* What if we’re given **a list of words** and asked to find all of them on the board?
+  In that case, using a **Trie** would be more efficient.
+* Can we optimize further by pruning impossible paths early?
+
+#### 📘 中文
+
+* 如果允許斜著走，該如何修改？
+* 如果題目要求找出所有出現單字的路徑或起點？
+* 如果不是一個單字，而是一個單字清單，該怎麼辦？
+  這時候可以考慮用 **Trie（前綴樹）** 來提升效率。
+* 是否可以加入剪枝策略來提早中止不可能成功的搜尋路徑？
