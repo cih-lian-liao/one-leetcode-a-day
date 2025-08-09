@@ -494,7 +494,101 @@ Space complexity is O(min(n, Σ)) where Σ is the character set size, because th
 * How would you also return the substring itself, not just the length?
 * How would you modify this to allow at most *k* repeated characters?
 * How would you handle Unicode grapheme clusters, like emojis that take up two code units in JavaScript?
-* How would you solve it if the input is a stream of characters rather than a string in memory?"\*
+* How would you solve it if the input is a stream of characters rather than a string in memory?"
+
+#
+#
+#
+
+
+### 🔄 Follow-up — Return the substring itself｜同時回傳子字串
+
+**Q:** How would you modify the solution so that it also returns the actual substring, not just the length?  
+**A:**  
+We can keep track of the starting index of the longest substring found so far. Whenever we update the best length, we also record the current `left` index. At the end, we slice the substring from `best_start` to `best_start + best_len`.
+
+---
+
+#### 🐍 Python Implementation
+```python
+def longestSubstring_no_repeat(s: str):
+    lastSeen = {}     # char -> most recent index
+    left = 0          # left boundary of the current window
+    best_len = 0      # length of the best substring so far
+    best_start = 0    # start index of the best substring
+
+    for right, c in enumerate(s):
+        # If c is a duplicate inside the current window, move left pointer
+        if c in lastSeen and lastSeen[c] >= left:
+            left = lastSeen[c] + 1
+
+        # Update the last seen index for c
+        lastSeen[c] = right
+
+        # Check if we found a longer window
+        current_len = right - left + 1
+        if current_len > best_len:
+            best_len = current_len
+            best_start = left
+
+    # Return both the length and the substring itself
+    return best_len, s[best_start: best_start + best_len]
+
+# Example
+print(longestSubstring_no_repeat("abcabcbb"))  # (3, 'abc')
+print(longestSubstring_no_repeat("pwwkew"))    # (3, 'wke')
+````
+
+---
+
+#### 💛 JavaScript Implementation
+
+```javascript
+function longestSubstringNoRepeat(s) {
+  const lastSeen = new Map();
+  let left = 0;
+  let bestLen = 0;
+  let bestStart = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    const c = s[right];
+    if (lastSeen.has(c) && lastSeen.get(c) >= left) {
+      left = lastSeen.get(c) + 1;
+    }
+
+    lastSeen.set(c, right);
+
+    const currentLen = right - left + 1;
+    if (currentLen > bestLen) {
+      bestLen = currentLen;
+      bestStart = left;
+    }
+  }
+
+  // Return both the length and the substring
+  return [bestLen, s.slice(bestStart, bestStart + bestLen)];
+}
+
+// Example
+console.log(longestSubstringNoRepeat("abcabcbb")); // [3, 'abc']
+console.log(longestSubstringNoRepeat("pwwkew"));   // [3, 'wke']
+```
+
+---
+
+#### 📊 Complexity
+
+* **Time:** O(n) — both pointers only move forward.
+* **Space:** O(min(n, Σ)) — stores last seen index of each unique character in the current window.
+
+---
+
+#### 💡 Key Takeaways
+
+* The original logic is unchanged — we only add `best_start` to remember the starting index of the longest substring.
+* When we find a longer valid window, we update both `best_len` and `best_start`.
+* At the end, we slice the string once to get the substring.
+
 
 #
 #
@@ -548,3 +642,4 @@ In game mechanics involving sequences of moves, you may want to reward the playe
 
 **ZH:**
 在遊戲機制中，如果遊戲包含動作或移動的連續記錄，可能需要計算玩家**最長的不重複動作連續串**，以給予額外獎勵或評分。這題的邏輯可以直接應用到這種情境。
+
