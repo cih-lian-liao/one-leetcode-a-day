@@ -265,3 +265,116 @@ class SolutionSorting:
 4. **排序法適合快速寫**，Set 法適合面試最佳解。
 5. **題目核心是「連續數值」不是「相鄰下標」**。
 
+
+# 🎤 Full Spoken-Style Interview Answer
+
+### 1. Clarify the Problem and Read Examples
+*Me (spoken style):*  
+“Okay, let me make sure I understand the problem clearly.  
+We are given an unsorted array of integers, and I need to find the length of the longest sequence of consecutive numbers.  
+Important point: consecutive means numbers like 1, 2, 3, 4 … not necessarily placed next to each other in the array.  
+
+For example, if the input is `[100,4,200,1,3,2]`, the longest consecutive run is `[1,2,3,4]`, so the answer should be `4`.  
+Another example: `[0,3,7,2,5,8,4,6,0,1]`. The consecutive run is from 0 up to 8, so the length is `9`.  
+
+Is that interpretation correct?”  
+
+---
+
+### 2. Discuss Edge Cases
+*Me (spoken style):*  
+“I also want to think about edge cases.  
+- If the array is empty, the answer should be `0`.  
+- If the array has only one element, like `[5]`, then the answer is `1`.  
+- If the array contains duplicates, for example `[1,2,2,3]`, the duplicates should not affect the result, because we just care about unique values.  
+- It should also work fine with negative numbers, like `[-1,0,1,2]`, where the answer is `4`.  
+
+So, I’ll keep these in mind when I design the solution.”  
+
+---
+
+### 3. Consider Brute-Force and Optimal Approach
+*Me (spoken style):*  
+“The brute force idea could be: for every number in the array, try to expand left and right to count how long a consecutive sequence can go.  
+But that can easily become O(n²), because for each number I might scan forward many times. That’s not efficient.  
+
+So, I want an optimal solution.  
+The trick here is to use a **HashSet**. With a set, I can check in O(1) average time whether a number exists.  
+Then, for each number, I only start a new sequence if it does not have a predecessor—that means if `num-1` is not in the set.  
+If it’s a start, I expand forward with `num+1, num+2, …` until the sequence ends.  
+This way, each number is visited at most twice, and the time complexity is O(n) on average.  
+This is a classic set-based problem.”  
+
+---
+
+### 4. Explain and Implement Optimal Code
+*Me (spoken style):*  
+“Okay, now I’ll write down the code in Python and explain as I go.”  
+
+```python
+from typing import List
+
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        # If the list is empty, return 0 immediately
+        if not nums:
+            return 0
+
+        # Put all numbers in a set to allow O(1) lookups
+        num_set = set(nums)
+
+        longest = 0
+
+        # Loop through each number in the set
+        for num in num_set:
+            # Only treat num as a starting point if num-1 does not exist
+            if (num - 1) not in num_set:
+                current = num
+                streak = 1
+
+                # Expand forward while consecutive numbers exist
+                while (current + 1) in num_set:
+                    current += 1
+                    streak += 1
+
+                # Update the maximum streak length
+                longest = max(longest, streak)
+
+        return longest
+````
+
+*Me (spoken style):*
+“So in this code:
+
+* Step 1: I check if the list is empty.
+* Step 2: I put all numbers in a set. This removes duplicates and lets me do quick membership checks.
+* Step 3: I loop through each number. If `num-1` is not in the set, it means this is the start of a new sequence.
+* Step 4: From that start, I count how far I can go consecutively.
+* Step 5: I update the result with the maximum streak length.
+
+Finally, I return the longest length.”
+
+---
+
+### 5. Discuss Time and Space Complexity
+
+*Me (spoken style):*
+“The time complexity is O(n) on average.
+Each number is processed at most twice: once when checking if it’s a start, and maybe once during the forward expansion.
+The space complexity is O(n) because I store the numbers in a set.
+
+If I used the sorting approach, it would be O(n log n) time and O(1) extra space, but the set approach is faster for large input.”
+
+---
+
+### 6. Mention Follow-up Questions
+
+*Me (spoken style):*
+“Some possible follow-up questions could be:
+
+* What if the array is extremely large and does not fit in memory? In that case, we may need to use external storage or streaming techniques.
+* What if the numbers are not integers, but floating-point values? Then the idea of consecutive doesn’t really make sense, so I would clarify the requirements.
+* What if we need to actually return the sequence, not just its length? Then I could store the sequence values while expanding.
+
+These would be interesting extensions of the problem.”
+
