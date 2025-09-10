@@ -1,180 +1,249 @@
 
-# LeetCode 228: Summary Ranges
 
-### **Problem Description**
+# 📝 LeetCode 228: Summary Ranges (English UMPIRE Notes)
 
-Given a **sorted unique integer array** `nums`, return the **smallest sorted list of ranges** that cover all the numbers in the array exactly. That is, each element of `nums` is covered by exactly one of the ranges, and there is no gap in between the ranges.
+### 🔍 Understand
 
-A range `[a,b]` is represented as:
-- `"a->b"` if `a != b`
-- `"a"` if `a == b`
+#### Problem
 
-### **Example 1**
-- **Input**: `nums = [0, 1, 2, 4, 5, 7]`
-- **Output**: `["0->2", "4->5", "7"]`
+You are given a **sorted array of unique integers**. Summarize the consecutive numbers into compact ranges:
 
-### **Example 2**
-- **Input**: `nums = [0, 2, 3, 4, 6, 8, 9]`
-- **Output**: `["0", "2->4", "6", "8->9"]`
+* Single number → `"x"`
+* Range from `a` to `b` → `"a->b"`
 
-### **Example 3**
-- **Input**: `nums = []`
-- **Output**: `[]`
+#### Examples
+
+* `[-1,0,1,2,4,5,7] → ["-1->2","4->5","7"]`
+* `[0,2,3,4,6,8,9] → ["0","2->4","6","8->9"]`
+* `[] → []`
+* `[5] → ["5"]`
 
 ---
 
-##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
+### 🧩 Match
 
-### **1. Understand**
+* Array is sorted and strictly increasing.
+* We can group consecutive runs (`nums[i+1] == nums[i] + 1`).
+* Two typical approaches:
 
-#### **Inputs**
-- `nums`: A sorted array of integers (may be empty, contains unique elements).
-
-#### **Outputs**
-- A list of strings where each string represents a range.
-
-#### **Constraints**
-- The array is sorted in **increasing order**.
-- No duplicate elements are present.
-- The result must have minimal ranges.
-
-#### **Clarifications**
-1. If the input is empty, the output is an empty list.
-2. If an integer has no consecutive neighbor, it is treated as a range with a single element.
+  1. **Single pointer (while loop cursor)**
+  2. **Two pointers (`left`, `right`)**
 
 ---
 
-### **2. Match**
+### 🛠 Plan
 
-This problem can be matched to **array traversal problems**:
-- Identify consecutive ranges while iterating.
-- A range is "broken" when two numbers are not consecutive (`nums[i] != nums[i-1] + 1`).
+#### Single Pointer (while loop)
 
-**Relevant data structure**: A simple list for storing ranges.
+* Use `i` to scan.
+* Mark `start = nums[i]`.
+* Extend while consecutive.
+* Append `"start->end"` or single `"x"`.
 
-**Algorithm pattern**: 
-- Iterate through the array.
-- Use pointers (`start` and `nums[i-1]`) to track ranges.
+#### Two Pointers
 
----
-
-### **3. Plan**
-
-#### **Steps**
-1. Handle the edge case where `nums` is empty. Return `[]`.
-2. Initialize an empty `result` list to store ranges and a variable `start` to track the beginning of the current range.
-3. Iterate over the array starting from the second element (`i = 1`).
-   - If `nums[i]` is **not consecutive** with `nums[i-1]`:
-     - Add the range from `start` to `nums[i-1]` to `result`.
-     - Update `start` to the current element (`nums[i]`).
-4. After the loop, add the last range to the result.
-5. Return the result.
-
-#### **Edge Cases**
-1. `nums = []` -> Output: `[]`
-2. `nums = [1]` -> Output: `["1"]`
-3. `nums = [1, 3]` -> Output: `["1", "3"]`
-4. `nums = [1, 2, 3, 5, 6]` -> Output: `["1->3", "5->6"]`
-
-#### **Time Complexity**
-- `O(n)` where `n` is the length of the input array `nums`.
-
-#### **Space Complexity**
-- `O(1)` additional space, as we store results in the output list.
+* `left` marks the start of a range.
+* `right` expands until break.
+* Append range and move `left = right + 1`.
 
 ---
 
-### **4. Implement**
+### 💻 Implementations
+
+#### 🌟 Version 1: Single Pointer (while loop)
 
 ```python
 from typing import List
 
 class Solution:
     def summaryRanges(self, nums: List[int]) -> List[str]:
-        # Step 1: Handle empty input
-        if not nums:
-            return []
-        
-        # Step 2: Initialize result and starting point
+        ans = []   # Store the final result
+        i = 0      # Cursor pointer
+
+        while i < len(nums):
+            start = nums[i]  # Mark the beginning of a range
+
+            # Extend the range while consecutive
+            while i < len(nums) - 1 and nums[i] + 1 == nums[i + 1]:
+                i += 1
+
+            # nums[i] is now the end of the range
+            if start != nums[i]:
+                ans.append(f"{start}->{nums[i]}")
+            else:
+                ans.append(str(nums[i]))
+
+            i += 1  # Move cursor forward
+        return ans
+```
+
+---
+
+#### 🌟 Version 2: Two Pointers (left/right)
+
+```python
+from typing import List
+
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
         result = []
-        start = nums[0]
-        
-        # Step 3: Traverse the array
-        for i in range(1, len(nums)):
-            # If not consecutive
-            if nums[i] != nums[i - 1] + 1:
-                if start == nums[i - 1]:
-                    result.append(str(start))  # Single number
+        n = len(nums)
+        left = 0  # Left pointer marks start
+
+        for right in range(n):
+            # If last element OR break in consecutiveness
+            if right == n - 1 or nums[right] + 1 != nums[right + 1]:
+                if left == right:
+                    result.append(str(nums[left]))
                 else:
-                    result.append(f"{start}->{nums[i - 1]}")  # Range
-                start = nums[i]  # Update start
-        
-        # Step 4: Add the final range
-        if start == nums[-1]:
-            result.append(str(start))
-        else:
-            result.append(f"{start}->{nums[-1]}")
-        
-        # Step 5: Return result
+                    result.append(f"{nums[left]}->{nums[right]}")
+                # Reset left for next range
+                left = right + 1
         return result
 ```
 
-#### **Implementation Notes**
-1. **Initialization**: Start with the first number of the range.
-2. **Checking Consecutiveness**: Use the condition `nums[i] != nums[i - 1] + 1`.
-3. **Adding Ranges**: Check if the range has one or multiple elements before adding it to the result.
-4. **Final Range**: Always add the last range after the loop.
+---
+
+### 🔎 Review
+
+* Both methods handle:
+
+  * Empty input
+  * Single element
+  * All consecutive
+  * All isolated numbers
 
 ---
 
-### **5. Review**
+### ⚡ Evaluate
 
-#### **Test Case 1**
-Input: `nums = [0, 1, 2, 4, 5, 7]`  
-Output: `["0->2", "4->5", "7"]`
+* **Time Complexity**: `O(n)` (each element visited at most twice).
+* **Space Complexity**: `O(1)` extra (excluding output).
 
-**Dry Run**:
-1. Initialize `start = 0`, `result = []`.
-2. Loop through `nums`:
-   - `i = 1`: Consecutive (`1` is `0+1`), continue.
-   - `i = 2`: Consecutive (`2` is `1+1`), continue.
-   - `i = 3`: Not consecutive (`4 != 2+1`), add `"0->2"` to `result`.
-     - Update `start = 4`.
-   - `i = 4`: Consecutive (`5` is `4+1`), continue.
-   - `i = 5`: Not consecutive (`7 != 5+1`), add `"4->5"` to `result`.
-     - Update `start = 7`.
-3. End of loop: Add `"7"` to `result`.
-4. Return `["0->2", "4->5", "7"]`.
+<br>
 
----
+# 🌸 中文 UMPIRE 筆記 (LeetCode 228: 區間總結)
 
-### **6. Evaluate**
+### 🔍 理解題意
 
-#### **Time Complexity**
-- **O(n)**: Single traversal of the array.
+給定一個 **已排序且不重複的整數陣列**，需要將連續的區間轉換成字串：
 
-#### **Space Complexity**
-- **O(1)**: No additional storage beyond the output list.
+* 單一數字 → `"x"`
+* 區間 `a` 到 `b` → `"a->b"`
 
-#### **Optimization**
-- The solution is already optimal for its constraints.
+#### 範例
+
+* `[-1,0,1,2,4,5,7] → ["-1->2","4->5","7"]`
+* `[0,2,3,4,6,8,9] → ["0","2->4","6","8->9"]`
+* `[] → []`
+* `[5] → ["5"]`
 
 ---
 
-### **Additional Notes**
+### 🧩 思路匹配
 
-#### **Why This Problem is Important**
-- Tests the ability to handle sorted data and detect patterns in arrays.
-- Demonstrates edge case handling and array traversal techniques.
+* 陣列已經排序、嚴格遞增。
+* 可以分成兩種典型解法：
 
-#### **Prerequisites for Practicing**
-- Understanding of array traversal.
-- Familiarity with string formatting and list manipulation in Python.
+  1. **單指針 while 游標法**
+  2. **雙指針 left/right 法**
 
-#### **Industry Relevance**
-- Range processing is a common task in analytics and data pipelines (e.g., log analysis, summarization).
+---
 
-#### **Follow-up Practice Problems**
-1. **Merge Intervals (LeetCode 56)** - Handling overlapping intervals.
-2. **Missing Ranges (LeetCode 163)** - Identifying gaps in ranges.
-3. **Insert Interval (LeetCode 57)** - Adding a range into an existing set of intervals.
+### 🛠 解題計劃
+
+#### 單指針
+
+* 用 `i` 掃陣列。
+* `start = nums[i]` 當區間起點。
+* 內層 while 延伸區間直到不連續。
+* 輸出 `"start->end"` 或單一數字。
+
+#### 雙指針
+
+* `left` 指向區間起點。
+* `right` 移動直到不連續。
+* 輸出 `left..right`，然後把 `left = right + 1`。
+
+---
+
+### 💻 程式碼實作
+
+#### 🌟 版本一：單指針 while 游標法
+
+```python
+from typing import List
+
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        ans = []   # 存放結果
+        i = 0      # 游標指標
+
+        while i < len(nums):
+            start = nums[i]  # 起點
+
+            # 延伸這段區間直到不連續
+            while i < len(nums) - 1 and nums[i] + 1 == nums[i + 1]:
+                i += 1
+
+            # nums[i] 是區間的終點
+            if start != nums[i]:
+                ans.append(f"{start}->{nums[i]}")
+            else:
+                ans.append(str(nums[i]))
+
+            i += 1  # 移到下一個數字
+        return ans
+```
+
+---
+
+#### 🌟 版本二：雙指針 left/right 法
+
+```python
+from typing import List
+
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        result = []
+        n = len(nums)
+        left = 0   # 區間起點
+
+        for right in range(n):
+            # 如果是最後一個元素或下一個不連續
+            if right == n - 1 or nums[right] + 1 != nums[right + 1]:
+                if left == right:
+                    result.append(str(nums[left]))
+                else:
+                    result.append(f"{nums[left]}->{nums[right]}")
+                # 更新 left 指向下一段起點
+                left = right + 1
+        return result
+```
+
+---
+
+### 🔎 檢查
+
+* ✅ 空陣列 → `[]`
+* ✅ 單一元素 → `["x"]`
+* ✅ 全部連續 → `["a->b"]`
+* ✅ 全部不連續 → 每個獨立輸出
+
+---
+
+### ⚡ 複雜度分析
+
+* **時間**：`O(n)`
+* **空間**：`O(1)` 額外空間
+
+<br>
+
+# 📌 附加筆記
+
+* **單指針法**：程式碼更短，適合熟悉 while loop 的人。
+* **雙指針法**：邏輯直觀，適合面試時清楚表達「起點 → 終點 → 收段 → 繼續下一段」。
+* 都必須注意 **flush 最後一段**，否則最後區間會漏掉。
+* 記得測試邊界案例：`[]`、`[5]`、`[1,2,3]`、`[1,3,5]`。
+
+<br>
