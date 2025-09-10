@@ -247,3 +247,112 @@ class Solution:
 * 記得測試邊界案例：`[]`、`[5]`、`[1,2,3]`、`[1,3,5]`。
 
 <br>
+
+# 🎤 Full Spoken-Style Interview Answer (with while loop version)
+
+### 1. Clarify the problem and read examples/constraints
+
+**What you can say:**
+
+> Let me first make sure I understand the problem.
+> We are given a sorted array of unique integers. I need to summarize the consecutive numbers into compact string ranges.
+> For example, if the input is `[-1,0,1,2,4,5,7]`, the output should be `["-1->2","4->5","7"]`.
+> Another example, `[0,2,3,4,6,8,9]` should give `["0","2->4","6","8->9"]`.
+> If the array is empty, then the result should be just an empty list.
+> Okay, that makes sense.
+
+---
+
+### 2. Discuss edge cases
+
+**What you can say:**
+
+> I also want to think about edge cases.
+>
+> * If the array is empty, return an empty list.
+> * If the array has only one element, like `[5]`, the result is `["5"]`.
+> * If all numbers are consecutive, like `[1,2,3,4]`, then the result is just one range `["1->4"]`.
+> * If none are consecutive, like `[1,3,5]`, then each becomes its own single number string.
+>   These cases make sure my logic works in all scenarios.
+
+---
+
+### 3. Consider brute-force and optimal approach
+
+**What you can say:**
+
+> A brute-force solution would be: for each number, scan forward until the sequence breaks, then output it. But even that is still O(n).
+> Since the array is sorted, we can solve it in one single pass, which is optimal.
+> The approach is:
+>
+> * Use a pointer `i`.
+> * Mark the start of a range.
+> * Move forward while numbers are consecutive.
+> * Once it breaks, record the range and continue.
+>   That way, every number is processed once, and it’s very efficient.
+
+---
+
+### 4. Explain and implement optimal code (while loop version)
+
+**What you can say while coding (spoken walkthrough):**
+
+> Okay, let me write the code using a while loop and a single pointer.
+
+```python
+from typing import List
+
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        result = []     # Store final ranges
+        i = 0           # Pointer that scans through the array
+
+        while i < len(nums):
+            start = nums[i]  # Mark the beginning of the current range
+
+            # Extend the range while next numbers are consecutive
+            while i < len(nums) - 1 and nums[i] + 1 == nums[i + 1]:
+                i += 1
+
+            # Now nums[i] is the end of the current range
+            if start != nums[i]:
+                result.append(f"{start}->{nums[i]}")
+            else:
+                result.append(str(nums[i]))
+
+            # Move to the next element after finishing this range
+            i += 1
+
+        return result
+```
+
+**What you can say (explaining the code):**
+
+> Here’s how this works.
+> I use a variable `i` to scan through the array. At the start of each range, I store `start = nums[i]`.
+> Then I use an inner while loop to extend the sequence as long as the numbers are consecutive.
+> When the inner loop ends, I know `nums[i]` is the last number of this range.
+> If start equals end, I just append it as a single number. Otherwise, I append `"start->end"`.
+> Finally, I move `i` forward by one to continue with the next potential range.
+
+---
+
+### 5. Discuss time and space complexity
+
+**What you can say:**
+
+> The time complexity is O(n). Here’s why: every element is processed exactly once. When I look at an element, either it extends the current consecutive range inside the inner loop, or it becomes the end of a range when the loop breaks. In either case, the pointer i always moves forward and never goes backward. That means each number is visited only once throughout the algorithm. So overall, the complexity is linear in the size of the input array, O(n).
+
+> The space complexity is O(1) extra, aside from the output list.
+
+---
+
+### 6. Mention follow-up questions
+
+**What you can say:**
+
+> Some possible follow-up questions could be:
+>
+> * What if the input array is not sorted? Then I would sort it first, which makes the complexity O(n log n).
+> * What if duplicates are allowed? Then we need to decide whether duplicates should be merged into ranges or kept separate.
+> * How would we handle streaming data, where numbers arrive one by one? In that case, we could maintain an open range and flush it whenever a gap occurs.
