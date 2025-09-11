@@ -1,161 +1,238 @@
-# LeetCode 57: Insert Interval
 
-### Problem Statement
-You are given an array of non-overlapping intervals `intervals` where `intervals[i] = [start_i, end_i]` represent the start and end of the `i`th interval, and `intervals` is sorted in ascending order by `start_i`. You are also given an interval `newInterval = [start, end]` that you need to insert into `intervals`. 
 
-The intervals should still be sorted and non-overlapping after you insert `newInterval`.
+# 📝 LeetCode 57 — Insert Interval
 
-**Example Input**:
-```plaintext
-intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+
+
+### 🌟 UMPIRE (English Version)
+
+### 🔍 U — Understand
+
+* You are given a list of sorted, non-overlapping intervals.
+* You need to insert a new interval into it and merge overlaps if necessary.
+* Return the final list sorted and non-overlapping.
+* **Example:**
+  Input: `[[1,3],[6,9]], new=[2,5]` → Output: `[[1,5],[6,9]]`.
+
+---
+
+### 🧩 M — Match
+
+* This is a **classic interval problem**.
+* Because the input intervals are sorted and non-overlapping, we can solve it in **O(n)** with a **three-phase scan**:
+
+  1. Add intervals that end before `new.start`.
+  2. Merge intervals that overlap with `new`.
+  3. Add intervals that start after `new.end`.
+
+---
+
+### 🗺️ P — Plan
+
+#### Pseudocode
+
 ```
+res = []
+i = 0
+[start, end] = newInterval
 
-**Example Output**:
-```plaintext
-[[1,2],[3,10],[12,16]]
-```
+# Phase 1: add all intervals ending before new starts
+while intervals[i].end < start:
+    res.append(intervals[i])
 
----
+# Phase 2: merge overlaps
+while intervals[i].start <= end:
+    start = min(start, intervals[i].start)
+    end   = max(end, intervals[i].end)
 
-##### UMPIRE Method: (U)nderstand | (M)atch | (P)lan | (I)mplement | (E)valuate
-
-#### **1. Understand**
-- **Input**: A list of intervals `intervals`, where each interval is `[start, end]` (sorted and non-overlapping), and a new interval `newInterval = [start, end]`.
-- **Output**: A new list of intervals that remains sorted and non-overlapping after inserting `newInterval`.
-- **Constraints**:
-  - `0 <= intervals.length <= 10^4`
-  - `intervals[i].length == 2`
-  - `intervals[i][0] <= intervals[i][1]`
-  - `newInterval.length == 2`
-  - `newInterval[0] <= newInterval[1]`
-- **Ambiguity**:
-  - If `intervals` is empty, simply return `[newInterval]`.
-  - If `newInterval` overlaps multiple intervals, they should be merged into a single interval.
-
----
-
-#### **2. Match**
-- **Problem Type**: Interval merging and insertion.
-- **Pattern**: This problem aligns with the "two-pointer" or "linear traversal" approach due to the sorted nature of the intervals.
-- **Data Structures**:
-  - Use a result list to collect the merged intervals.
-  - Use variables to track and merge overlapping intervals.
-
----
-
-#### **3. Plan**
-1. Traverse the intervals using a pointer `i`.
-2. Add all intervals that appear **before** `newInterval` (do not overlap).
-3. Merge all intervals that **overlap** with `newInterval`.
-   - Update the start and end of `newInterval` based on overlaps.
-4. Add all intervals that appear **after** `newInterval` (do not overlap).
-5. Return the `result` list.
-
-**Pseudocode**:
-```plaintext
-Initialize result = []
-Set i = 0
-
-1. Add intervals that end before newInterval starts.
-While i < intervals.length and intervals[i][1] < newInterval[0]:
-    Add intervals[i] to result
-    Increment i
-
-2. Merge overlapping intervals.
-While i < intervals.length and intervals[i][0] <= newInterval[1]:
-    Update newInterval[0] = min(newInterval[0], intervals[i][0])
-    Update newInterval[1] = max(newInterval[1], intervals[i][1])
-    Increment i
-Add newInterval to result
-
-3. Add intervals that start after newInterval ends.
-While i < intervals.length:
-    Add intervals[i] to result
-    Increment i
-
-Return result
+# Phase 3: append merged new, then the rest
+res.append([start, end])
+res += remaining intervals
 ```
 
 ---
 
-#### **4. Implement**
+### 💻 I — Implement (Python with detailed comments)
 
 ```python
-def insert(intervals, newInterval):
-    result = []  # Final list of merged intervals
-    i = 0  # Pointer to traverse intervals
+from typing import List
 
-    # Step 1: Add intervals before newInterval
-    while i < len(intervals) and intervals[i][1] < newInterval[0]:
-        result.append(intervals[i])
-        i += 1
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        """
+        Insert a new interval into sorted, non-overlapping intervals.
+        Merge overlaps if necessary.
+        Time: O(n), Space: O(n)
+        """
+        res = []   # final result list
+        i = 0      # pointer index
+        n = len(intervals)
 
-    # Step 2: Merge overlapping intervals
-    while i < len(intervals) and intervals[i][0] <= newInterval[1]:
-        newInterval[0] = min(newInterval[0], intervals[i][0])  # Update start
-        newInterval[1] = max(newInterval[1], intervals[i][1])  # Update end
-        i += 1
-    result.append(newInterval)  # Add the merged interval
+        # Unpack newInterval into start and end
+        start, end = newInterval
 
-    # Step 3: Add intervals after newInterval
-    while i < len(intervals):
-        result.append(intervals[i])
-        i += 1
+        # 1) Add all intervals ending before newInterval starts
+        #    Condition: current interval's end < new.start
+        while i < n and intervals[i][1] < start:
+            res.append(intervals[i])
+            i += 1
 
-    return result
+        # 2) Merge all intervals overlapping with newInterval
+        #    Overlap condition (closed intervals): intervals[i].start <= new.end
+        while i < n and intervals[i][0] <= end:
+            start = min(start, intervals[i][0])  # expand left bound
+            end = max(end, intervals[i][1])      # expand right bound
+            i += 1
+
+        # Add the merged newInterval
+        res.append([start, end])
+
+        # 3) Add the rest (all intervals strictly to the right)
+        while i < n:
+            res.append(intervals[i])
+            i += 1
+
+        return res
 ```
 
 ---
 
-#### **5. Review**
-**Test Case**: `intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]`
+### 🧐 R — Review
 
-**Dry Run**:
-1. Step 1: Add `[1,2]` to `result`.
-   - `result = [[1,2]]`
-   - `i = 1`
-2. Step 2: Merge `[3,5]`, `[6,7]`, and `[8,10]` with `[4,8]`:
-   - `newInterval = [3,10]`
-   - `i = 4`
-   - `result = [[1,2],[3,10]]`
-3. Step 3: Add `[12,16]` to `result`.
-   - `result = [[1,2],[3,10],[12,16]]`
+* Dry run with examples confirms correctness:
 
-**Output**:
-```plaintext
-[[1,2],[3,10],[12,16]]
+  * `[[1,3],[6,9]], new=[2,5]` → `[[1,5],[6,9]]`
+  * `[[1,2],[3,5],[6,7],[8,10],[12,16]], new=[4,8]` → `[[1,2],[3,10],[12,16]]`
+
+---
+
+### 📊 E — Evaluate
+
+* **Time Complexity:** O(n), because we scan each interval once.
+* **Space Complexity:** O(n), for storing result.
+
+<br>
+
+# 🐼 UMPIRE (中文版本)
+
+### 🔍 U — 理解題意
+
+* 已給定一組**排序且不重疊**的區間。
+* 將一個新的區間插入其中，若有重疊則合併。
+* 回傳最後仍然**有序且不重疊**的結果。
+* **範例:**
+  輸入: `[[1,3],[6,9]], new=[2,5]` → 輸出: `[[1,5],[6,9]]`.
+
+---
+
+### 🧩 M — 匹配典型模式
+
+* 這是**經典區間合併**問題。
+* 由於輸入已排序且不重疊，可以用**三段式掃描**在 **O(n)** 內完成：
+
+  1. 加入所有在新區間左側的。
+  2. 將與新區間重疊的合併。
+  3. 加入新區間右側的。
+
+---
+
+### 🗺️ P — 計畫
+
+#### 偽代碼
+
+```
+res = []
+i = 0
+[start, end] = newInterval
+
+# 第一段：加入所有結尾 < new.start 的
+while intervals[i].end < start:
+    res.append(intervals[i])
+
+# 第二段：合併所有與 new 有重疊的
+while intervals[i].start <= end:
+    start = min(start, intervals[i].start)
+    end   = max(end, intervals[i].end)
+
+# 加入合併後的新區間
+res.append([start, end])
+
+# 第三段：補上右側剩下的
+res += 剩餘的區間
 ```
 
 ---
 
-#### **6. Evaluate**
+### 💻 I — 實作 (Python 詳細註解)
 
-- **Time Complexity**:
-  - Each interval is processed once.
-  - Complexity: O(n), where n is the number of intervals.
-- **Space Complexity**:
-  - Only the `result` list is used.
-  - Complexity: O(1) extra space (excluding output).
+```python
+from typing import List
+
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        """
+        將 newInterval 插入已排序且不重疊的 intervals，並合併所有重疊的。
+        時間: O(n)，空間: O(n)
+        """
+        res = []  # 最終結果
+        i = 0
+        n = len(intervals)
+
+        start, end = newInterval  # 拆解 newInterval
+
+        # 1) 加入所有在 new 左側的
+        # 條件：interval.end < new.start
+        while i < n and intervals[i][1] < start:
+            res.append(intervals[i])
+            i += 1
+
+        # 2) 合併與 new 有重疊的
+        # 條件：interval.start <= new.end
+        while i < n and intervals[i][0] <= end:
+            start = min(start, intervals[i][0])  # 擴張左邊界
+            end = max(end, intervals[i][1])      # 擴張右邊界
+            i += 1
+
+        # 加入合併後的 newInterval
+        res.append([start, end])
+
+        # 3) 加入所有在 new 右側的
+        while i < n:
+            res.append(intervals[i])
+            i += 1
+
+        return res
+```
 
 ---
 
-### Additional Notes
+### 🧐 R — 檢查
 
-#### **Why This Problem is Important**
-- Frequently asked in coding interviews to test array traversal, merging, and condition-based logic.
-- Tests understanding of edge cases like overlapping intervals, empty input, and sorting logic.
+* 手算範例：
 
-#### **Prerequisites**
-- Understanding of interval merging logic.
-- Familiarity with condition-based loops and list operations.
+  * `[[1,3],[6,9]], new=[2,5]` → `[[1,5],[6,9]]`
+  * `[[1,2],[3,5],[6,7],[8,10],[12,16]], new=[4,8]` → `[[1,2],[3,10],[12,16]]`
 
-#### **Industry Relevance**
-- Scheduling problems in operating systems.
-- Calendar and event management applications.
-- Data aggregation tasks in databases.
+---
 
-#### **Follow-up Practice Problems**
-1. LeetCode 56: Merge Intervals
-2. LeetCode 435: Non-overlapping Intervals
-3. LeetCode 986: Interval List Intersections
-4. LeetCode 1288: Remove Covered Intervals
+### 📊 E — 評估
+
+* **時間複雜度:** O(n)，單趟掃描。
+* **空間複雜度:** O(n)，用來儲存結果。
+
+<br>
+
+
+# 📌 附加筆記 (Notes & Pitfalls)
+
+* **Overlap condition**：要用 `intervals[i][0] <= end`，因為端點相接（例如 `[3,5]` 和 `[5,7]`）也算重疊。
+* **Common mistakes**：
+  * 忘記把合併後的 newInterval 加入結果。
+  * 忘記補上右側的 intervals。
+  * 把 touching endpoints 當作不重疊。
+* **Best learning**：
+  * 先在紙上畫數軸測試五種案例（完全左邊、完全右邊、跨多段、相接、空陣列）。
+  * 熟悉「三段式掃描」模式，這會在許多 interval 題目出現。
+
+<br>
+
