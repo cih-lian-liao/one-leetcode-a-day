@@ -236,3 +236,136 @@ class Solution:
 
 <br>
 
+
+
+# 🎤 Full Spoken-Style Interview Answer
+
+
+
+### 1️⃣ Clarify the problem and read examples
+
+**Spoken style**
+“Okay, let me first make sure I understand the problem correctly.
+
+We are given a list of intervals. These intervals are already sorted by their start times, and they do not overlap with each other.
+
+We are also given a new interval. My task is to insert this new interval into the list, and if there are any overlaps, I should merge them so that the final result is still sorted and contains no overlapping intervals.
+
+For example, if the input is `[[1,3], [6,9]]` and the new interval is `[2,5]`, then the output should be `[[1,5],[6,9]]`, because `[1,3]` and `[2,5]` overlap and we merge them into `[1,5]`.
+
+Another example: if the input is `[[1,2],[3,5],[6,7],[8,10],[12,16]]` and the new interval is `[4,8]`, then the output should be `[[1,2],[3,10],[12,16]]`. Because the new interval `[4,8]` overlaps with `[3,5]`, `[6,7]`, and `[8,10]`. After merging all of them, we get `[3,10]`.
+
+So that’s my understanding. Does that sound correct?”
+
+---
+
+### 2️⃣ Discuss edge cases
+
+**Spoken style**
+“Now, let me think about some edge cases.
+
+* First, if the input list of intervals is empty, then the answer should just be the new interval itself.
+* Second, if the new interval is completely to the left of all intervals, for example new interval is `[0,1]` and the first interval starts at 2, then the new interval should just be added in the front.
+* Third, if the new interval is completely to the right of all intervals, then we just append it to the end.
+* Fourth, when the new interval touches the end of another interval, like `[3,5]` and `[5,7]`, we should still merge them into `[3,7]`.
+
+So these are the edge cases I should keep in mind.”
+
+---
+
+### 3️⃣ Consider brute-force and optimal approach
+
+**Spoken style**
+“Let me consider approaches.
+
+A brute force solution could be: just add the new interval into the list, sort the whole list by start time, and then merge all overlapping intervals. Merging itself is O(n), sorting is O(n log n), so total would be O(n log n). This is correct, but not optimal.
+
+Because the original intervals are already sorted and non-overlapping, we can do better.
+
+The optimal approach is a single pass, O(n) time. We can think of the process in three phases:
+
+1. Add all intervals that are completely before the new interval.
+2. Merge all intervals that overlap with the new interval by expanding the start and end.
+3. Add all intervals that come completely after the new interval.
+
+This way, I only scan once from left to right, and that will give me the final result.”
+
+---
+
+### 4️⃣ Explain and implement optimal code
+
+**Spoken style**
+“Now I will explain how I would implement this step by step. I’ll write in Python.
+
+First, I create a result list to store the final intervals. I also take `start` and `end` from the new interval, because I may need to expand them.
+
+Then I use an index `i` to loop through the intervals.
+
+* In the first while loop, I add all intervals that end before the new interval starts.
+* In the second while loop, I merge all intervals that overlap with the new interval. I check the overlap condition: if the current interval’s start is less than or equal to `end`, then they overlap. In that case, I update `start = min(start, current.start)` and `end = max(end, current.end)`.
+* After merging, I append this new `[start, end]` into the result.
+* Finally, in the third while loop, I add all remaining intervals that start after the new interval ends.
+
+Let me show the code.”
+
+```python
+from typing import List
+
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        res = []
+        i = 0
+        n = len(intervals)
+
+        start, end = newInterval
+
+        # 1. Add all intervals before newInterval
+        while i < n and intervals[i][1] < start:
+            res.append(intervals[i])
+            i += 1
+
+        # 2. Merge overlapping intervals
+        while i < n and intervals[i][0] <= end:
+            start = min(start, intervals[i][0])
+            end = max(end, intervals[i][1])
+            i += 1
+
+        # Add merged interval
+        res.append([start, end])
+
+        # 3. Add the rest
+        while i < n:
+            res.append(intervals[i])
+            i += 1
+
+        return res
+```
+
+**Spoken style explanation while coding**
+“So first I unpack the new interval into start and end. Then in the first while loop, I keep pushing intervals into the result until I find one that may overlap. Next, in the second while loop, I merge everything that overlaps with the new interval. After I finish merging, I add the merged interval. Finally, I push all the intervals that come after. This ensures the output stays sorted and non-overlapping.”
+
+---
+
+### 5️⃣ Discuss time and space complexity
+
+**Spoken style**
+“In terms of complexity, time complexity is O(n), because I scan through the list of intervals at most once.
+
+Space complexity is O(n), because I need to build the result list, but aside from that, I only use a few variables, so the extra space is O(1).
+
+This is optimal, because we cannot do better than O(n) since we have to look at each interval at least once.”
+
+---
+
+### 6️⃣ Mention follow-up questions
+
+**Spoken style**
+“Some possible follow-up questions could be:
+
+* What if the intervals are not initially sorted? Then I would have to insert the new interval and sort, which would increase the complexity to O(n log n).
+* What if the intervals can overlap initially? Then I would have to merge everything after inserting, which becomes similar to the Merge Intervals problem.
+* What if the intervals are half-open intervals instead of closed intervals? Then the definition of overlap would slightly change, but the approach would still be similar.
+
+So that’s how I would approach and solve this problem.”
+
+
