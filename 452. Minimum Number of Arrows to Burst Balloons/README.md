@@ -295,3 +295,140 @@ class SolutionCNAlt:
 
 <br>
 
+## 🎤 Full Spoken-Style Interview Answer
+
+*(Imagine the interviewer has just given you the problem. You've read it silently for about 30-60 seconds.)*
+
+### **1. Clarify the Problem and Examples**
+
+**(You - to the interviewer):**
+
+"Okay, thank you for the problem. I've had a moment to read it. Just to make sure I'm on the same page, let me quickly restate my understanding."
+
+*(You turn slightly away from the monitor, as if thinking, and then look back.)*
+
+"So, we're given a list of integer pairs, where each pair `[x_start, x_end]` represents the horizontal width of a balloon. Our goal is to find the *minimum* number of arrows we need to shoot to burst all of them. An arrow shot vertically from position `x` on the x-axis will burst any balloon whose range includes `x`."
+
+"Let me just walk through one of the examples to confirm my understanding. If we have `points = [[10,16], [2,8], [1,6], [7,12]]`..."
+
+*(You might gesture with your hands as if drawing the intervals in the air.)*
+
+"...we have four balloons. I can see that an arrow shot at, say, `x = 6` would burst both the `[1,6]` and `[2,8]` balloons, because 6 is within both of their ranges. Then, for the remaining balloons `[7,12]` and `[10,16]`, an arrow at `x = 11` or `x=12` could burst both of them. So, in total, that would be two arrows. The goal is to find this minimum number, which is 2. Does that sound correct?"
+
+*(Interviewer will likely confirm. Now you have established a clear understanding.)*
+
+### **2. Discuss Edge Cases**
+
+**(You):**
+
+"Great. Before I think about the algorithm, I'd like to quickly consider a few edge cases to make sure my solution will be robust."
+
+  * "First, what if the input list, `points`, is empty? In that case, we don't have any balloons, so we wouldn't need any arrows. The function should return `0`."
+  * "Second, what if there's only one balloon, like `[[1, 5]]`? We would clearly need just one arrow, so the output should be `1`."
+  * "The constraints also mention that the coordinates can be large and negative, so my solution should handle that. Also, a balloon's start and end could be the same, like `[3, 3]`, which is essentially a point. My logic should work for that as well."
+
+"Thinking about these cases helps frame the problem better."
+
+### **3. Consider Brute-Force and Optimal Approach**
+
+**(You):**
+
+"Okay, now for the approach. A brute-force solution here seems difficult. We can't just test every possible x-coordinate to shoot from, because the coordinates can be very large, and it's not a discrete set of points. Trying all combinations of arrows would be far too slow."
+
+"This problem feels like it's about making a series of smart, optimal choices. That immediately makes me think of a **Greedy Algorithm**."
+
+*(This is a key moment where you state your high-level strategy.)*
+
+"The greedy idea would be to use each arrow as effectively as possible. With every single arrow, we want to burst the maximum number of balloons we can."
+
+"So, how do we make that greedy choice? To process the balloons in a consistent way, sorting them first seems like the right move. The big question is: **what do we sort by?** The start points or the end points?"
+
+*(Pause for a second, as if considering the options.)*
+
+"Let's think about that. If we sort by the start points, we might deal with a very long balloon first, like `[0, 1000]`. If we shoot an arrow for that one, we don't really know the best place to shoot it. But... if we sort by the **end points**, the strategy becomes much clearer."
+
+"By sorting by the end points, we are always dealing with the balloon that is about to 'escape' first. This is the most urgent balloon to take care of. Once we identify this first-ending balloon, we have to shoot an arrow to burst it. To maximize the utility of this one arrow, where should we shoot it? The best place would be at its very end point, `x_end`. Why? Because that position is the right-most possible point that can still burst this urgent balloon, which gives us the best chance to also hit other balloons that might overlap with it."
+
+"So, my greedy strategy is:
+
+1.  Sort all balloons by their end points.
+2.  Take the first balloon, and shoot an arrow at its end point. This counts as one arrow.
+3.  Then, iterate through the rest of the balloons. For each balloon, if it can be burst by our last arrow, we just move on. If it can't, it means we need a new arrow. We then shoot this new arrow at the *new* balloon's end point and repeat the process."
+
+"This feels like a solid and efficient approach."
+
+### **4. Explain and Implement Optimal Code**
+
+**(You - as you start typing):**
+
+"Alright, with that plan, I'll start coding now and I'll explain my thought process as I go."
+
+```python
+# (You start typing)
+class Solution:
+    def findMinArrowShots(self, points: list[list[int]]) -> int:
+        # "First, I'll handle the edge case we talked about. 
+        # If the points list is empty, we just return 0."
+        if not points:
+            return 0
+
+        # "Next, the core of my greedy strategy: I'm sorting the points list. 
+        # I'll use a lambda function as the key, to sort based on the second element, 
+        # which is the end point of each balloon."
+        points.sort(key=lambda x: x[1])
+
+        # "Now, I'll initialize my variables. I'll need a counter for the arrows.
+        # Since we know the list is not empty at this point, we will need at least one arrow.
+        # So I'll start `arrows` at 1."
+        arrows = 1
+        
+        # "I also need to keep track of where my last arrow was shot. 
+        # For the first arrow, I'll shoot it at the end of the very first balloon in my sorted list.
+        # I'll call this `arrow_pos`."
+        arrow_pos = points[0][1]
+
+        # "Okay, now I'll loop through the rest of the balloons, starting from the second one."
+        # (You can use a more descriptive variable name in the loop for clarity)
+        for balloon in points[1:]:
+            # "Inside the loop, for each balloon, I need to make a decision.
+            # Can my last arrow burst this balloon?
+            # I can check this by looking at the balloon's start point.
+            # If the balloon's start point is GREATER than my arrow's position..."
+            if balloon[0] > arrow_pos:
+                # "...it means this balloon starts after my arrow, so it can't be burst.
+                # In this case, I need a new arrow."
+                arrows += 1
+                
+                # "And since I'm using a new arrow, I need to update its position.
+                # The best place for this new arrow is at the end of the CURRENT balloon."
+                arrow_pos = balloon[1]
+            
+            # "If the balloon's start point is NOT greater than arrow_pos, 
+            # it means it's overlapping, and my last arrow already takes care of it. 
+            # So I don't need to do anything, and I can just continue to the next balloon."
+
+        # "Finally, after the loop has finished, the `arrows` counter will hold the minimum number needed.
+        # So I'll just return it."
+        return arrows
+```
+
+### **5. Discuss Time/Space Complexity**
+
+**(You - after finishing the code):**
+
+"Okay, the code is complete. Now I'd like to quickly discuss its complexity."
+
+  * "For **Time Complexity**, the most expensive operation here is the initial sort. Sorting a list of N balloons will take **O(N log N)** time. After the sort, I have a single loop that goes through all the balloons once, which is an O(N) operation. Therefore, the total time complexity is dominated by the sorting step, which is **O(N log N)**."
+
+  * "For **Space Complexity**, I am modifying the list in-place with `.sort()`. The space used by the sorting algorithm itself in Python (Timsort) is O(N) in the worst case and O(log N) on average for its internal stack. I'm not creating any other data structures that scale with the input size. So, the space complexity would be **O(N)** in the worst case."
+
+### **6. Mention Follow-up Questions**
+
+**(You):**
+
+"This greedy approach seems to be quite efficient and correctly solves the problem. If we had more time, some interesting follow-up questions could be:"
+
+  * "What if the arrows had a blast radius, meaning they could burst balloons that are close but not directly on the line of fire?"
+  * "Or, what if we had a limited number of arrows, and we wanted to burst the maximum number of balloons possible? That might change the approach towards something like dynamic programming."
+
+"But for the current problem, I believe this solution is complete and optimal. Do you have any questions for me?"
